@@ -1,0 +1,5 @@
+.card-body.active {
+  border: 1px solid blue;
+  background: #f2f2ff;
+  color: blue;
+}
