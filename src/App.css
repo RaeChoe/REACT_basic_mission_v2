@@ -8,11 +8,12 @@ section {
   flex-direction: column;
   gap: 10px;
   align-items: center;
+  width: 100%;
 }
 article {
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: space-between;
   border: 1px solid #ebebeb;
   border-radius: 10px;
   width: 100%;

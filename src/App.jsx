@@ -1,7 +1,8 @@
 import "./App.css";
 import reactData from "./data/data.json";
 import StudyList from "./components/StudyList";
-import { useState } from "react";
+import StudySummary from "./components/StudySummary";
+import { useState, useMemo } from "react";
 
 function App() {
   const [selectedId, setSelectedId] = useState(null);
@@ -20,12 +21,14 @@ function App() {
     );
   };
 
-  const filteredData = reactData.filter(item => {
-    const categoryMatch = category === "all" || category === item.category;
-    const keywordMatch = item.title.toLowerCase().includes(keyword.toLowerCase());
-    const favoriteMatch = !favoriteOnly || favoriteIds.includes(item.id);
-    return categoryMatch && keywordMatch && favoriteMatch;
-  });
+  const filteredData = useMemo(() => {
+    return reactData.filter(item => {
+      const categoryMatch = category === "all" || category === item.category;
+      const keywordMatch = item.title.toLowerCase().includes(keyword.toLowerCase());
+      const favoriteMatch = !favoriteOnly || favoriteIds.includes(item.id);
+      return categoryMatch && keywordMatch && favoriteMatch;
+    });
+  }, [keyword, category, favoriteOnly, favoriteIds]);
 
   return (
     <>
@@ -72,6 +75,7 @@ function App() {
       >
         {favoriteOnly ? "전체 항목 보기" : "즐겨찾기만 보기"}
       </button>
+      <StudySummary total={reactData} visible={filteredData} favorite={favoriteIds} />
       <StudyList
         items={filteredData}
         onSelect={onSelect}
