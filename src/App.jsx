@@ -1,25 +1,69 @@
-import { useEffect, useState } from "react";
 import "./App.css";
-import data from "./data/data.json";
+import reactData from "./data/data.json";
 import StudyInfo from "./components/StudyInfo";
 import StudyList from "./components/StudyList";
+import { useState } from "react";
 
 function App() {
-  const [list, setList] = useState(data);
-  console.log(list);
+  console.log(reactData);
+  const m2Content = reactData[0];
   const [selectedId, setSelectedId] = useState(null);
+  const [category, setCategory] = useState("all");
+  const [keyword, setKeyword] = useState("");
 
   const onSelect = _id => {
     setSelectedId(_id);
   };
 
+  const filteredData = reactData.filter(item => {
+    const categoryMatch = category === "all" || category === item.category;
+    const keyWordMatch = item.title.toLowerCase().includes(keyword.toLowerCase());
+    return categoryMatch && keyWordMatch;
+  });
+  console.log(filteredData);
+
   return (
-    <div className="container text-center py-5">
-      <h1>React Basic Review Mission 2</h1>
-      <p>전체 학습 항목 수: {list.length}개</p>
-      <StudyInfo title={list[0].title} desc={list[0].desc} category={list[0].category} />
-      <StudyList items={list} onSelect={onSelect} selectedId={selectedId} />
-    </div>
+    <>
+      <h1>React Mission 7</h1>
+      <p>전체 학습 항목수 : {reactData.length}개</p>
+      <hr />
+      <StudyInfo title={m2Content.title} desc={m2Content.desc} category={m2Content.category} />
+      <hr />
+      <h2>필터</h2>
+      <div className="button-group">
+        <button className={category === "all" ? "active" : ""} onClick={() => setCategory("all")}>
+          전체
+        </button>
+        <button
+          className={category === "concept" ? "active" : ""}
+          onClick={() => setCategory("concept")}
+        >
+          concept
+        </button>
+        <button
+          className={category === "library" ? "active" : ""}
+          onClick={() => setCategory("library")}
+        >
+          library
+        </button>
+        <button className={category === "hook" ? "active" : ""} onClick={() => setCategory("hook")}>
+          hook
+        </button>
+      </div>
+
+      <hr />
+      <h2>검색</h2>
+      <input
+        type="text"
+        value={keyword}
+        placeholder="제목 검색"
+        onChange={e => {
+          setKeyword(e.target.value);
+        }}
+      />
+      <hr />
+      <StudyList items={filteredData} onSelect={onSelect} selectedId={selectedId} />
+    </>
   );
 }
 
