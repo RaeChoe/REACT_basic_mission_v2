@@ -2,7 +2,7 @@ import "./App.css";
 import reactData from "./data/data.json";
 import StudyList from "./components/StudyList";
 import StudySummary from "./components/StudySummary";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 
 function App() {
   const [selectedId, setSelectedId] = useState(null);
@@ -10,16 +10,19 @@ function App() {
   const [keyword, setKeyword] = useState("");
   const [favoriteIds, setFavoriteIds] = useState([]);
   const [favoriteOnly, setFavoriteOnly] = useState(false);
+  const renderCount = useRef(0);
+
+  renderCount.current += 1;
 
   const onSelect = id => {
     setSelectedId(id);
   };
 
-  const onFavorite = id => {
+  const handleToggleFavorite = useCallback(id => {
     setFavoriteIds(prev =>
       prev.includes(id) ? prev.filter(itemId => itemId !== id) : [...prev, id],
     );
-  };
+  }, []);
 
   const filteredData = useMemo(() => {
     return reactData.filter(item => {
@@ -29,6 +32,21 @@ function App() {
       return categoryMatch && keywordMatch && favoriteMatch;
     });
   }, [keyword, category, favoriteOnly, favoriteIds]);
+
+  const searchInputRef = useRef(null);
+  const handleFocusSearch = () => {
+    searchInputRef.current.focus();
+  };
+  useEffect(() => {
+    searchInputRef.current.focus();
+  }, []);
+
+  const reset = () => {
+    setKeyword("");
+    setCategory("all");
+    setFavoriteOnly(false);
+    searchInputRef.current.focus();
+  };
 
   return (
     <>
@@ -58,14 +76,19 @@ function App() {
       </div>
       <hr />
       <h2>검색</h2>
-      <input
-        type="text"
-        value={keyword}
-        placeholder="제목 검색"
-        onChange={e => {
-          setKeyword(e.target.value);
-        }}
-      />
+      <div>
+        <input
+          ref={searchInputRef}
+          type="text"
+          value={keyword}
+          placeholder="제목 검색"
+          onChange={e => {
+            setKeyword(e.target.value);
+          }}
+        />
+        <button onClick={handleFocusSearch}>검색창으로 이동</button>
+        <button onClick={reset}>초기화</button>
+      </div>
       <hr />
       <button
         type="button"
@@ -75,13 +98,18 @@ function App() {
       >
         {favoriteOnly ? "전체 항목 보기" : "즐겨찾기만 보기"}
       </button>
-      <StudySummary total={reactData} visible={filteredData} favorite={favoriteIds} />
+      <StudySummary
+        total={reactData}
+        visible={filteredData}
+        favorite={favoriteIds}
+        renderCount={renderCount}
+      />
       <StudyList
         items={filteredData}
-        onSelect={onSelect}
         selectedId={selectedId}
+        onSelect={onSelect}
         favoriteIds={favoriteIds}
-        onFavorite={onFavorite}
+        onToggleFavorite={handleToggleFavorite}
       />
     </>
   );
