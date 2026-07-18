@@ -30,3 +30,8 @@ article.active {
 input {
   width: 50%;
 }
+aside {
+  display: flex;
+  justify-content: center;
+  width: 80%;
+}

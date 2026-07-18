@@ -76,7 +76,7 @@ function App() {
       </div>
       <hr />
       <h2>검색</h2>
-      <div>
+      <aside>
         <input
           ref={searchInputRef}
           type="text"
@@ -88,7 +88,7 @@ function App() {
         />
         <button onClick={handleFocusSearch}>검색창으로 이동</button>
         <button onClick={reset}>초기화</button>
-      </div>
+      </aside>
       <hr />
       <button
         type="button"
