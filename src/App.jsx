@@ -1,38 +1,41 @@
 import "./App.css";
 import reactData from "./data/data.json";
-import StudyInfo from "./components/StudyInfo";
 import StudyList from "./components/StudyList";
 import { useState } from "react";
 
 function App() {
-  console.log(reactData);
-  const m2Content = reactData[0];
   const [selectedId, setSelectedId] = useState(null);
   const [category, setCategory] = useState("all");
   const [keyword, setKeyword] = useState("");
+  const [favoriteIds, setFavoriteIds] = useState([]);
+  const [favoriteOnly, setFavoriteOnly] = useState(false);
 
-  const onSelect = _id => {
-    setSelectedId(_id);
+  const onSelect = id => {
+    setSelectedId(id);
+  };
+
+  const onFavorite = id => {
+    setFavoriteIds(prev =>
+      prev.includes(id) ? prev.filter(itemId => itemId !== id) : [...prev, id],
+    );
   };
 
   const filteredData = reactData.filter(item => {
     const categoryMatch = category === "all" || category === item.category;
-    const keyWordMatch = item.title.toLowerCase().includes(keyword.toLowerCase());
-    return categoryMatch && keyWordMatch;
+    const keywordMatch = item.title.toLowerCase().includes(keyword.toLowerCase());
+    const favoriteMatch = !favoriteOnly || favoriteIds.includes(item.id);
+    return categoryMatch && keywordMatch && favoriteMatch;
   });
-  console.log(filteredData);
 
   return (
     <>
       <h1>React Mission 7</h1>
       <p>전체 학습 항목수 : {reactData.length}개</p>
       <hr />
-      <StudyInfo title={m2Content.title} desc={m2Content.desc} category={m2Content.category} />
-      <hr />
       <h2>필터</h2>
       <div className="button-group">
         <button className={category === "all" ? "active" : ""} onClick={() => setCategory("all")}>
-          전체
+          All
         </button>
         <button
           className={category === "concept" ? "active" : ""}
@@ -50,7 +53,6 @@ function App() {
           hook
         </button>
       </div>
-
       <hr />
       <h2>검색</h2>
       <input
@@ -62,7 +64,21 @@ function App() {
         }}
       />
       <hr />
-      <StudyList items={filteredData} onSelect={onSelect} selectedId={selectedId} />
+      <button
+        type="button"
+        onClick={() => {
+          setFavoriteOnly(prev => !prev);
+        }}
+      >
+        {favoriteOnly ? "전체 항목 보기" : "즐겨찾기만 보기"}
+      </button>
+      <StudyList
+        items={filteredData}
+        onSelect={onSelect}
+        selectedId={selectedId}
+        favoriteIds={favoriteIds}
+        onFavorite={onFavorite}
+      />
     </>
   );
 }
